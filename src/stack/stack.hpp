@@ -1,5 +1,5 @@
-#ifndef SRC_STACK_S21_STACK_H
-#define SRC_STACK_S21_STACK_H
+#ifndef CONTAINERS_STACK_STACK_HPP
+#define CONTAINERS_STACK_STACK_HPP
 
 #include <algorithm>
 #include <initializer_list>
@@ -108,4 +108,4 @@ class stack {
 };
 }  // namespace s21
 
-#endif  // SRC_STACK_S21_STACK_H
+#endif  // CONTAINERS_STACK_STACK_HPP

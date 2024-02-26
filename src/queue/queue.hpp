@@ -1,5 +1,5 @@
-#ifndef SRC_QUEUE_S21_QUEUE_H
-#define SRC_QUEUE_S21_QUEUE_H
+#ifndef CONTAINERS_QUEUE_QUEUE_HPP
+#define CONTAINERS_QUEUE_QUEUE_HPP
 
 #include <iostream>
 #include <utility>
@@ -135,4 +135,4 @@ class queue {
 };
 }  // namespace s21
 
-#endif  // SRC_QUEUE_S21_QUEUE_H
+#endif  // CONTAINERS_QUEUE_QUEUE_HPP

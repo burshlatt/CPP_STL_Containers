@@ -1,5 +1,5 @@
-#ifndef SRC_VECTOR_S21_VECTOR_H
-#define SRC_VECTOR_S21_VECTOR_H
+#ifndef CONTAINERS_VECTOR_VECTOR_HPP
+#define CONTAINERS_VECTOR_VECTOR_HPP
 
 #include <algorithm>
 #include <climits>
@@ -213,4 +213,4 @@ class vector {
 };
 }  // namespace s21
 
-#endif  // SRC_VECTOR_S21_VECTOR_H
+#endif  // CONTAINERS_VECTOR_VECTOR_HPP

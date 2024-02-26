@@ -1,5 +1,5 @@
-#ifndef CPP2_S21_CONTAINERS_1_SRC_S21_LIST_H
-#define CPP2_S21_CONTAINERS_1_SRC_S21_LIST_H
+#ifndef CONTAINERS_LIST_LIST_HPP
+#define CONTAINERS_LIST_LIST_HPP
 
 #include <iostream>
 
@@ -295,17 +295,18 @@ class list {
     }
   }
 
- private:
-  void MakeLoop() {
-    end_ptr_->next_node_ = begin_ptr_;
-    begin_ptr_->prev_node_ = end_ptr_;
-  };
+  private:
+    void MakeLoop() {
+      end_ptr_->next_node_ = begin_ptr_;
+      begin_ptr_->prev_node_ = end_ptr_;
+    };
 
-  Node<value_type> *begin_ptr_;
-  Node<value_type> *end_ptr_;
-  size_type size_;
+  private:
+    Node<value_type> *begin_ptr_;
+    Node<value_type> *end_ptr_;
+    size_type size_;
 };
 
 }  // namespace s21
 
-#endif  // CPP2_S21_CONTAINERS_1_SRC_S21_LIST_H
+#endif  // CONTAINERS_LIST_LIST_HPP

@@ -1,5 +1,5 @@
 CC = g++
-FLAGS = -Wall -Werror -Wextra -std=c++17
+FLAGS = -Wall -Werror -Wextra -O3 -std=c++17
 TEST_FLAGS = -lgtest -lgmock -pthread
 
 #	=== Выполнить все ===
