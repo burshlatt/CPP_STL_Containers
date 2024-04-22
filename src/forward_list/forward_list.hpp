@@ -6,9 +6,6 @@
 
 namespace tlcm {
 template <typename Type>
-/*
-  Структура узла, котоаря хранит указатель на след. узел и сам элемент.
-*/
 struct Node {
   using pointer = Type*;
   using reference = Type&;
@@ -22,10 +19,6 @@ struct Node {
   Node<Type>* next;
 };
 
-/*
-  Итератор для моего списка, решил не реализовывать его константную версию,
-  дабы не перегружать программу лишинм кодом, ведь по заданию это и так не нужно.
-*/
 template <typename Node>
 class fwl_iterator {
  public:
@@ -69,9 +62,6 @@ class fwl_iterator {
   Node* current_;
 };
 
-/*
-  Сам список.
-*/
 template <typename Type>
 class forward_list {
  public:
@@ -100,19 +90,12 @@ class forward_list {
     }
   }
 
-  /*
-    Функции возвращающие итераторы начала и конца, не стал делать их константные версии, дабы не увеличивать объем кода
-  */
   iterator begin() noexcept { return iterator(head_); }
   iterator end() noexcept { return iterator(null_); }
 
   bool empty() const noexcept { return size_ == 0ULL; };
   std::size_t size() const noexcept { return size_; };
 
-  /*
-    Функция добавления элемента в произвольную позиции, добавляет следющим элементом после заданного итератора.
-    Добавляется следующий, так как список односвязный и нет возможности при добавлении получить указатель на прошлый узел чтобы связать его с новым узлом.
-  */
   iterator insert_after(iterator pos, const Type& value) {
     if (pos == end()) {
       throw std::out_of_range("insert_after: invalid position");
@@ -133,10 +116,6 @@ class forward_list {
     return iterator(new_node);
   }
 
-  /*
-    Функция удаления элемента из произвольной позиции, удаляет следющий элемент после заданного итератора.
-    Удаляется следующий, так как список односвязный и нет возможности при удалении получить указатель на прошлый узел чтобы связать его с следующим узлом.
-  */
   iterator erase_after(iterator pos) {
     if (pos == end() || pos.node() == tail_) {
       throw std::out_of_range("erase_after: invalid position");
@@ -167,9 +146,6 @@ class forward_list {
     return iterator(current_node->next);
   }
 
-  /*
-    Функция добавления элемента в начало списка, работает за O(1), так как имеется указатель на первый элемент
-  */
   void push_front(const Type& value) {
     head_ = new Node<Type>(value, head_);
 
@@ -180,9 +156,6 @@ class forward_list {
     ++size_;
   }
 
-  /*
-    Функция добавления элемента в конец списка, работает за O(1), так как имеется указатель на последний элемент
-  */
   void push_back(const Type& value) {
     Node<Type>* new_node{new Node<Type>(value)};
 
@@ -196,9 +169,6 @@ class forward_list {
     ++size_;
   }
 
-  /*
-    Функция удаления элемента с начала списка, работает за O(1)
-  */
   void pop_front() {
     if (empty()) {
       return;
@@ -212,9 +182,6 @@ class forward_list {
     --size_;
   }
 
-  /*
-    Функция поиска элемента по заданному итератору
-  */
   iterator find(const Type& value) {
     for (auto it{begin()}; it != end(); ++it) {
       if (*it == value) {
@@ -226,11 +193,11 @@ class forward_list {
   }
 
  private:
-  std::size_t size_; // Размер контейнера
+  std::size_t size_;
 
-  Node<Type>* head_; // Указатель на первый элемент в списке
-  Node<Type>* tail_; // Указатель на последний элемент в списке
-  Node<Type>* null_; // Просто указатель на nullptr
+  Node<Type>* head_;
+  Node<Type>* tail_;
+  Node<Type>* null_;
 };
 }  // namespace tlcm
 
