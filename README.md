@@ -1,1 +1,1 @@
-# containers
+# Implementation of STL containers
