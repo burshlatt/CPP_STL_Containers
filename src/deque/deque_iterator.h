@@ -13,7 +13,7 @@ public:
     using reference  = std::conditional_t<std::is_const_v<value_type>, const value_type&, value_type&>;
 
 public:
-    deque_iterator(value_type** data, size_type x, size_type y) :
+    deque_iterator(value_type* const* data, size_type x, size_type y) :
         _data(data),
         _x(x),
         _y(y)
@@ -82,24 +82,24 @@ public:
         return tmp;
     }
 
-    bool operator==(const deque_iterator &other) const {
+    bool operator==(const deque_iterator &other) const noexcept {
         return _x == other._x && _y == other._y;
     }
 
-    bool operator!=(const deque_iterator &other) const {
+    bool operator!=(const deque_iterator &other) const noexcept {
         return _x != other._x || _y != other._y;
     }
 
-    bool operator>(const deque_iterator &other) const {
+    bool operator>(const deque_iterator &other) const noexcept {
         return _x > other._x || (_x == other._x && _y > other._y);
     }
 
-    bool operator<(const deque_iterator &other) const {
+    bool operator<(const deque_iterator &other) const noexcept {
         return _x < other._x || (_x == other._x && _y < other._y);
     }
 
 private:
-    value_type** _data;
+    value_type* const* _data;
 
     size_type _x;
     size_type _y;
