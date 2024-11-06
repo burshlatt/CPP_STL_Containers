@@ -1,6 +1,9 @@
 #ifndef STACK_H
 #define STACK_H
 
+#include <utility>
+#include <algorithm>
+
 #include "../deque/deque.h"
 
 namespace s21 {
@@ -9,11 +12,11 @@ template<
     class Container = s21::deque<T>
 > class stack {
 public:
-    using value_type      = T;
-    using size_type       = std::size_t;
-
-    using reference       = T &;
-    using const_reference = const T &;
+    using container_type  = Container;
+    using value_type      = Container::value_type;
+    using size_type       = Container::size_type;
+    using reference       = Container::reference;
+    using const_reference = Container::const_reference;
 
 public:
     stack() :
@@ -35,6 +38,8 @@ public:
     stack(stack&& other) :
         _container(std::move(other._container))
     {}
+
+    ~stack() = default;
 
 public:
     reference top() {
@@ -67,6 +72,18 @@ public:
 
     void swap(stack& other) noexcept {
         std::swap(_container, other._container);
+    }
+
+    stack& operator=(const stack& other) {
+        _container = other._container;
+
+        return *this;
+    }
+
+    stack& operator=(stack&& other) {
+        _container = std::move(other._container);
+
+        return *this;
     }
 
 private:
