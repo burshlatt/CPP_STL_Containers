@@ -72,6 +72,6 @@ public:
 private:
     Container _container;
 };
-}  // namespace s21
+} // namespace s21
 
 #endif  // STACK_H

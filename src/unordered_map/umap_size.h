@@ -1,5 +1,5 @@
-#ifndef CONTAINERS_UNORDERED_MAP_SIZE_HPP
-#define CONTAINERS_UNORDERED_MAP_SIZE_HPP
+#ifndef UMAP_SIZE_H
+#define UMAP_SIZE_H
 
 #include <array>
 #include <limits>
@@ -7,6 +7,7 @@
 namespace s21::um {
 struct map_size {
     static constexpr const double kResizeAlpha{0.75};
+    
     static constexpr const std::array<std::size_t, 31> size{
         0ull,          4ull,
         12ull,         28ull,
@@ -28,4 +29,4 @@ struct map_size {
 };
 } // namespace s21::um
 
-#endif // CONTAINERS_UNORDERED_MAP_SIZE_HPP
+#endif // UMAP_SIZE_H

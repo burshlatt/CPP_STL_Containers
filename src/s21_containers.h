@@ -1,12 +1,15 @@
-#ifndef SRC_S21_CONTAINERS_H
-#define SRC_S21_CONTAINERS_H
+#ifndef S21_CONTAINERS_H
+#define S21_CONTAINERS_H
 
-#include "Array/s21_array.h"
-#include "List/s21_list.h"
-#include "Map/s21_map.h"
-#include "Queue/s21_queue.h"
-#include "Set/s21_set.h"
-#include "Stack/s21_stack.h"
-#include "Vector/s21_vector.h"
+#include "array/array.h"
+#include "deque/deque.h"
+#include "forward_list/forward_list.h"
+#include "list/list.h"
+#include "map/map.h"
+#include "queue/queue.h"
+#include "set/set.h"
+#include "stack/stack.h"
+#include "unordered_map/unordered_map.h"
+#include "vector/vector.h"
 
-#endif  // SRC_S21_CONTAINERS_H
+#endif  // S21_CONTAINERS_H

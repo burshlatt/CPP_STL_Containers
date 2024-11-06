@@ -1,10 +1,9 @@
-#ifndef CONTAINERS_LIST_LIST_HPP
-#define CONTAINERS_LIST_LIST_HPP
+#ifndef LIST_H
+#define LIST_H
 
 #include <iostream>
 
 namespace s21 {
-
 template <typename Type>
 class Node {
  private:
@@ -307,6 +306,6 @@ class list {
     size_type size_;
 };
 
-}  // namespace s21
+} // namespace s21
 
-#endif  // CONTAINERS_LIST_LIST_HPP
+#endif  // LIST_H

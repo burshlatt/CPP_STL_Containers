@@ -252,6 +252,6 @@ private:
 
     size_type _block_size{4096 / sizeof(T)};
 };
-}  // namespace s21
+} // namespace s21
 
 #endif  // DEQUE_H

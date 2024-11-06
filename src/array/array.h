@@ -145,6 +145,6 @@ private:
 
     value_type _data[N + 1]{};
 };
-}  // namespace s21
+} // namespace s21
 
 #endif  // ARRAY_H

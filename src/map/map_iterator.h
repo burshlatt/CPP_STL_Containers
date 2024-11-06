@@ -1,11 +1,11 @@
-#ifndef CONTAINERS_MAP_M_ITERATOR_HPP
-#define CONTAINERS_MAP_M_ITERATOR_HPP
+#ifndef MAP_ITERATOR_H
+#define MAP_ITERATOR_H
 
 #include <iterator>
 
 namespace s21 {
 template <typename Node>
-class m_iterator {
+class map_iterator {
 public:
     using node_type  = Node;
     using value_type = typename Node::value_type;
@@ -13,7 +13,7 @@ public:
     using reference  = std::conditional_t<std::is_const_v<node_type>, typename Node::const_reference, typename Node::reference>;
 
 public:
-    m_iterator(node_type* current, node_type* null, node_type* root) noexcept :
+    map_iterator(node_type* current, node_type* null, node_type* root) noexcept :
         current_(current),
         null_(null),
         root_(root)
@@ -24,7 +24,7 @@ public:
 
     pointer operator->() { return &(current_->key_value); }
 
-    m_iterator &operator++() {
+    map_iterator &operator++() {
         if (current_ == null_)
             current_ = null_;
         else if (current_->right != null_) {
@@ -43,13 +43,13 @@ public:
         return *this;
     }
 
-    m_iterator operator++(int) {
-        m_iterator tmp(*this);
+    map_iterator operator++(int) {
+        map_iterator tmp(*this);
         ++(*this);
         return tmp;
     }
 
-    m_iterator &operator--() {
+    map_iterator &operator--() {
         if (current_ == null_)
             current_ = null_;
         else if (current_->left != null_) {
@@ -70,17 +70,17 @@ public:
 
     node_type* node() const noexcept { return current_; }
 
-    m_iterator operator--(int) {
-        m_iterator tmp(*this);
+    map_iterator operator--(int) {
+        map_iterator tmp(*this);
         --(*this);
         return tmp;
     }
 
-    bool operator==(const m_iterator &other) const {
+    bool operator==(const map_iterator &other) const {
         return current_ == other.current_;
     }
 
-    bool operator!=(const m_iterator &other) const {
+    bool operator!=(const map_iterator &other) const {
         return current_ != other.current_;
     }
 
@@ -91,4 +91,4 @@ private:
 };
 } // namespace s21
 
-#endif // CONTAINERS_MAP_M_ITERATOR_HPP
+#endif  // MAP_ITERATOR_H

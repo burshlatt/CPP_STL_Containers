@@ -1,10 +1,10 @@
-#ifndef TELECOM_HOMEWORK_FORWARD_LIST_HPP
-#define TELECOM_HOMEWORK_FORWARD_LIST_HPP
+#ifndef FORWARD_LIST_H
+#define FORWARD_LIST_H
 
 #include <iostream>
 #include <stdexcept>
 
-namespace tlcm {
+namespace s21 {
 template <typename Type>
 struct Node {
   using pointer = Type*;
@@ -199,6 +199,6 @@ class forward_list {
   Node<Type>* tail_;
   Node<Type>* null_;
 };
-}  // namespace tlcm
+} // namespace s21
 
-#endif  // TELECOM_HOMEWORK_FORWARD_LIST_HPP
+#endif  // FORWARD_LIST_H

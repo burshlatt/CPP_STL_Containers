@@ -108,4 +108,4 @@ private:
 };
 } // namespace s21
 
-#endif // DEQUE_ITERATOR_H
+#endif  // DEQUE_ITERATOR_H

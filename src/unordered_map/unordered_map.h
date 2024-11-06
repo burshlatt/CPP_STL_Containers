@@ -1,12 +1,12 @@
-#ifndef CONTAINERS_UNORDERED_MAP_UNORDERED_MAP_HPP
-#define CONTAINERS_UNORDERED_MAP_UNORDERED_MAP_HPP
+#ifndef UNORDERED_MAP_H
+#define UNORDERED_MAP_H
 
 #include <vector>
 #include <forward_list>
 #include <initializer_list>
 
-#include "size.hpp"
-#include "um_iterator.hpp"
+#include "umap_size.h"
+#include "umap_iterator.h"
 
 namespace s21 {
 template<
@@ -25,8 +25,8 @@ template<
         using bucket_const_iterator = typename std::forward_list<value_type>::const_iterator;
         using table_iterator        = typename std::vector<std::forward_list<value_type>>::iterator;
         using table_const_iterator  = typename std::vector<std::forward_list<value_type>>::const_iterator;
-        using iterator              = um_iterator<table_iterator, bucket_iterator>;
-        using const_iterator        = um_iterator<table_const_iterator, bucket_const_iterator>;
+        using iterator              = umap_iterator<table_iterator, bucket_iterator>;
+        using const_iterator        = umap_iterator<table_const_iterator, bucket_const_iterator>;
 
     private:
         using hasher     = Hash;
@@ -371,4 +371,4 @@ template<
 };
 } // namespace s21
 
-#endif // CONTAINERS_UNORDERED_MAP_UNORDERED_MAP_HPP
+#endif  // UNORDERED_MAP_H

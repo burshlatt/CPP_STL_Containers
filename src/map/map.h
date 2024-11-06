@@ -1,11 +1,11 @@
-#ifndef CONTAINERS_MAP_MAP_HPP
-#define CONTAINERS_MAP_MAP_HPP
+#ifndef MAP_H
+#define MAP_H
 
 #include <memory>
 #include <initializer_list>
 
-#include "node.hpp"
-#include "m_iterator.hpp"
+#include "map_node.h"
+#include "map_iterator.h"
 
 namespace s21 {
 template<
@@ -21,8 +21,8 @@ template<
         using compare_type   = Compare;
 
         using node_type      = node<Key, T>;
-        using iterator       = m_iterator<node_type>;
-        using const_iterator = m_iterator<const node_type>;
+        using iterator       = map_iterator<node_type>;
+        using const_iterator = map_iterator<const node_type>;
 
     public:
         map() :
@@ -515,4 +515,4 @@ template<
 };
 } // namespace s21
 
-#endif // CONTAINERS_MAP_MAP_HPP
+#endif  // MAP_H

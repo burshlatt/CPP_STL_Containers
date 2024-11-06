@@ -1,5 +1,5 @@
-#ifndef CONTAINERS_QUEUE_QUEUE_HPP
-#define CONTAINERS_QUEUE_QUEUE_HPP
+#ifndef QUEUE_H
+#define QUEUE_H
 
 #include <iostream>
 #include <utility>
@@ -133,6 +133,6 @@ class queue {
   node *tail_;
   size_type size_;
 };
-}  // namespace s21
+} // namespace s21
 
-#endif  // CONTAINERS_QUEUE_QUEUE_HPP
+#endif  // QUEUE_H

@@ -1,5 +1,5 @@
-#ifndef CONTAINERS_MAP_NODE_HPP
-#define CONTAINERS_MAP_NODE_HPP
+#ifndef MAP_NODE_H
+#define MAP_NODE_H
 
 namespace s21 {
 enum class node_color : bool { kRed, kBlack };
@@ -48,4 +48,4 @@ public:
 };
 } // namespace s21
 
-#endif // CONTAINERS_MAP_NODE_HPP
+#endif  // MAP_NODE_H
