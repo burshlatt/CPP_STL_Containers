@@ -1,6 +1,7 @@
 #ifndef DEQUE_H
 #define DEQUE_H
 
+#include <utility>
 #include <initializer_list>
 
 #include "../vector/vector.h"
@@ -212,6 +213,24 @@ public:
         size_type offset{(pos + _start_offset) % _block_size};
 
         return _blocks[block_idx][offset];
+    }
+
+    deque& operator=(const deque& other) {
+        for (const auto& item : other) {
+            push_back(item);
+        }
+
+        return *this;
+    }
+
+    deque& operator=(deque&& other) noexcept {
+        _start_block = std::exchange(other._start_block, 0);
+        _start_offset = std::exchange(other._start_offset, 0);
+        _end_block = std::exchange(other._end_block, 0);
+        _end_offset = std::exchange(other._end_offset, 0);
+        _blocks = std::move(other._blocks);
+
+        return *this;
     }
 
 private:
