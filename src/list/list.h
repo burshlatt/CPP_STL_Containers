@@ -1,311 +1,360 @@
 #ifndef LIST_H
 #define LIST_H
 
-#include <iostream>
+#include <memory>
+#include <utility>
+#include <iterator>
+#include <algorithm>
+#include <initializer_list>
+
+#include "list_node.h"
+#include "list_iterator.h"
 
 namespace s21 {
-template <typename Type>
-class Node {
- private:
-  template <typename IteratorType, typename NodeType>
-  friend class BaseIterator;
-  template <typename NodeType>
-  friend class list;
-  template <typename NodeType>
-  friend class ListConstIterator;
-  template <typename NodeType>
-  friend class ListIterator;
-  Node(Type value) : node_value_(value) {}
-  ~Node() = default;
+template<
+    class T,
+    class Allocator = std::allocator<Node<T>>
+> class list {
+public:
+    using value_type             = T;
+    using node_type              = Node<T>;
+    using size_type              = std::size_t;
 
-  Type node_value_;
-  Node<Type> *prev_node_;
-  Node<Type> *next_node_;
-};
+    using reference              = T&;
+    using const_reference        = const T&;
 
-template <class IteratorType, typename NodeType>
-class BaseIterator {
- public:
-  BaseIterator(Node<NodeType> *node_ptr = nullptr) : current_node_(node_ptr){};
-  BaseIterator(const IteratorType &iterator)
-      : IteratorType(iterator->current_node_){};
-  BaseIterator() = default;
+    using allocator_type         = Allocator;
+    using allocator_traits       = std::allocator_traits<Allocator>;
 
-  bool operator==(IteratorType const &other) const noexcept {
-    return (current_node_ == other.current_node_);
-  };
-  bool operator!=(IteratorType const &other) const noexcept {
-    return (current_node_ != other.current_node_);
-  };
-  IteratorType &operator++() {
-    current_node_ = current_node_->next_node_;
-    return *static_cast<IteratorType *>(this);
-  };
-  IteratorType &operator--() {
-    current_node_ = current_node_->prev_node_;
-    return *static_cast<IteratorType *>(this);
-  };
+    using pointer                = typename allocator_traits::pointer;
+    using const_pointer          = typename allocator_traits::const_pointer;
 
- protected:
-  Node<NodeType> *current_node_;
-};
+    using iterator               = list_iterator<Node<T>>;
+    using const_iterator         = list_iterator<const Node<T>>;
 
-template <typename Type>
-class ListConstIterator : public BaseIterator<ListConstIterator<Type>, Type> {
- public:
-  using BaseIterator<ListConstIterator, Type>::BaseIterator;
-  const Type &operator*() { return this->current_node_->node_value_; };
+    using reverse_iterator       = std::reverse_iterator<list_iterator<Node<T>>>;
+    using const_reverse_iterator = std::reverse_iterator<list_iterator<const Node<T>>>;
 
- protected:
-  template <typename T>
-  friend class list;
-};
-
-template <typename Type>
-class ListIterator : public BaseIterator<ListIterator<Type>, Type> {
- public:
-  using BaseIterator<ListIterator, Type>::BaseIterator;
-  Type &operator*() { return this->current_node_->node_value_; };
-
-  operator ListConstIterator<Type>() const noexcept {
-    return ListConstIterator<Type>(this->current_node_);
-  }
-
- protected:
-  template <typename T>
-  friend class list;
-};
-
-template <typename Type>
-class list {
- public:
-  using value_type = Type;
-  using pointer = Type *;
-  using reference = Type &;
-  using const_reference = const Type &;
-  using size_type = size_t;
-  using iterator = ListIterator<value_type>;
-  using const_iterator = ListConstIterator<value_type>;
-
-  list() : size_(0) {
-    end_ptr_ = new Node<Type>(0);
-    begin_ptr_ = end_ptr_;
-    MakeLoop();
-  }
-
-  list(size_type n) : list() {
-    while (size_ != n) {
-      this->push_back(0);
+public:
+    list() :
+        _alloc(),
+        _null(allocator_traits::allocate(_alloc, 1)),
+        _head(_null),
+        _tail(_null)
+    {
+        allocator_traits::construct(_alloc, _null);
     }
-  }
 
-  list(std::initializer_list<value_type> const &items) : list() {
-    for (auto it = items.begin(); it != items.end(); it++) {
-      push_back(*it);
+    explicit list(const Allocator& alloc) :
+        _alloc(alloc),
+        _null(allocator_traits::allocate(_alloc, 1)),
+        _head(_null),
+        _tail(_null)
+    {
+        allocator_traits::construct(_alloc, _null);
     }
-  }
 
-  list(const list &other) noexcept : list() {
-    for (auto it = other.begin(); it != other.end(); ++it) {
-      push_back(*it);
-    }
-  }
-
-  list(list &&other) noexcept
-      : begin_ptr_(other.begin_ptr_),
-        end_ptr_(other.end_ptr_),
-        size_(other.size_) {
-    other.end_ptr_ = new Node<value_type>(0);
-    other.begin_ptr_ = other.end_ptr_;
-    other.MakeLoop();
-    other.size_ = 0;
-  }
-
-  list &operator=(const list &other) noexcept {
-    if (this != &other) {
-      list temp(other);
-      std::swap(size_, temp.size_);
-      std::swap(begin_ptr_, temp.begin_ptr_);
-      std::swap(end_ptr_, temp.end_ptr_);
-    }
-    return *this;
-  }
-
-  list &operator=(list &&other) noexcept {
-    if (this != &other) {
-      std::swap(size_, other.size_);
-      std::swap(begin_ptr_, other.begin_ptr_);
-      std::swap(end_ptr_, other.end_ptr_);
-      other.clear();
-    }
-    return *this;
-  }
-
-  ~list() {
-    clear();
-    delete end_ptr_;
-  }
-
-  const_reference front() const { return begin_ptr_->node_value_; }
-  const_reference back() const { return end_ptr_->prev_node_->node_value_; }
-
-  iterator begin() noexcept { return iterator(begin_ptr_); }
-  iterator end() noexcept { return iterator(end_ptr_); }
-  const_iterator begin() const noexcept { return const_iterator(begin_ptr_); }
-  const_iterator end() const noexcept { return const_iterator(end_ptr_); }
-
-  bool empty() const noexcept { return (size_ == 0); };
-  size_type size() const noexcept { return (size_); };
-  size_type max_size() const noexcept {
-    return std::numeric_limits<ptrdiff_t>::max() / sizeof(Node<value_type>);
-  }
-
-  void clear() noexcept {
-    while (!empty()) {
-      erase(begin());
-    }
-  }
-
-  iterator insert(iterator pos, const_reference value) noexcept {
-    Node<value_type> *new_node = new Node(value);
-    Node<value_type> *prev_node = pos.current_node_->prev_node_;
-    Node<value_type> *next_node = pos.current_node_;
-    prev_node->next_node_ = new_node;
-    next_node->prev_node_ = new_node;
-    new_node->prev_node_ = prev_node;
-    new_node->next_node_ = next_node;
-    if (next_node == begin_ptr_) begin_ptr_ = new_node;
-    MakeLoop();
-    ++size_;
-    return iterator(new_node);
-  }
-
-  void erase(iterator pos) noexcept {
-    if (!empty() && pos.current_node_ != end_ptr_) {
-      Node<value_type> *prev_node = pos.current_node_->prev_node_;
-      Node<value_type> *next_node = pos.current_node_->next_node_;
-      prev_node->next_node_ = next_node;
-      next_node->prev_node_ = prev_node;
-      if (pos == begin()) begin_ptr_ = next_node;
-      MakeLoop();
-      delete pos.current_node_;
-      --size_;
-    }
-  }
-
-  void push_back(const_reference value) noexcept { insert(end(), value); }
-
-  void pop_back() noexcept {
-    if (!empty()) erase(--end());
-  }
-
-  void push_front(const_reference value) noexcept { insert(begin(), value); }
-
-  void pop_front() noexcept {
-    if (!empty()) erase(begin());
-  }
-
-  void swap(list &other) noexcept {
-    std::swap(this->begin_ptr_, other.begin_ptr_);
-    std::swap(this->end_ptr_, other.end_ptr_);
-    std::swap(this->size_, other.size_);
-  }
-
-  void merge(list &other) noexcept {
-    if (&other != this) {
-      auto it_1 = begin();
-      auto it_2 = other.begin();
-      while (it_1 != end() && it_2 != other.end()) {
-        if (*it_1 > *it_2) {
-          insert(it_1, *it_2);
-          auto temp_it = it_2;
-          ++it_2;
-          other.erase(temp_it);
-        } else {
-          ++it_1;
+    explicit list(size_type count, const Allocator& alloc = Allocator()) :
+        list(alloc)
+    {
+        for (size_type i{}; i < count; ++i) {
+            push_front(T());
         }
-      }
-      while (it_2 != other.end()) {
-        push_back(*it_2);
-        ++it_2;
-      }
-      other.clear();
     }
-  }
 
-  void splice(const_iterator pos, list &other) noexcept {
-    if (!other.empty() && &other != this) {
-      Node<value_type> *pos_node = pos.current_node_;
-      Node<value_type> *pos_prev_node = pos.current_node_->prev_node_;
-      Node<value_type> *other_begin = other.begin_ptr_;
-      Node<value_type> *other_end = other.end_ptr_->prev_node_;
-
-      pos_node->prev_node_ = other_end;
-      pos_prev_node->next_node_ = other_begin;
-      other_begin->prev_node_ = pos_prev_node;
-      other_end->next_node_ = pos_node;
-
-      if (pos == begin()) begin_ptr_ = other_begin;
-      MakeLoop();
-      size_ += other.size_;
-
-      other.begin_ptr_ = other.end_ptr_;
-      other.MakeLoop();
-      other.size_ = 0;
+    list(size_type count, const T& value, const Allocator& alloc = Allocator()) :
+        list(alloc)
+    {
+        insert(begin(), count, value);
     }
-  }
 
-  void reverse() noexcept {
-    if (!empty() && size_ > 1) {
-      for (auto it_1 = begin(), it_2 = --end();
-           it_1.current_node_ != it_2.current_node_ &&
-           it_1.current_node_->prev_node_ != it_2.current_node_;
-           ++it_1, --it_2) {
-        std::swap(*it_1, *it_2);
-      }
+    template<
+        class InputIt,
+        typename = std::enable_if_t<std::is_base_of_v<std::input_iterator_tag,
+                                    typename std::iterator_traits<InputIt>::iterator_category>>
+    > list(InputIt first, InputIt last, const Allocator& alloc = Allocator()) :
+        list(alloc)
+    {
+        insert(begin(), first, last);
     }
-  }
 
-  void unique() noexcept {
-    if (!empty() && size_ > 1) {
-      for (auto it = this->begin(); it != this->end();) {
-        auto it_2 = it;
-        ++it_2;
-        if (it_2 != end() && *it == *it_2) {
-          this->erase(it_2);
-        } else {
-          ++it;
+    list(const list& other) :
+        list(allocator_traits::select_on_container_copy_construction(other.get_allocator()))
+    {
+        insert(begin(), other.begin(), other.end());
+    }
+
+    list(const list& other, const Allocator& alloc) :
+        list(alloc)
+    {
+        insert(begin(), other.begin(), other.end());
+    }
+
+    list(list&& other) :
+        _alloc(other.get_allocator()),
+        _null(std::exchange(other._null, allocator_traits::allocate(other._alloc, 1))),
+        _head(std::exchange(other._head, other._null)),
+        _tail(std::exchange(other._tail, other._null))
+    {
+        allocator_traits::construct(other._alloc, other._null);
+    }
+
+    list(std::initializer_list<T> init, const Allocator& alloc = Allocator()) :
+        list(alloc)
+    {
+        insert(begin(), init);
+    }
+
+    ~list() {
+        clear();
+
+        allocator_traits::destroy(_alloc, _null);
+        allocator_traits::deallocate(_alloc, _null, 1);
+    }
+
+public:
+    list& operator=(const list& other) {
+        clear();
+
+        if (allocator_traits::propagate_on_container_copy_assignment::value) {
+            auto allocator{allocator_traits::select_on_container_copy_construction(other.get_allocator())};
+
+            if (_alloc != allocator) {
+                allocator_traits::destroy(_alloc, _null);
+                allocator_traits::deallocate(_alloc, _null, 1);
+
+                _alloc = std::move(allocator);
+
+                allocator_traits::allocate(_alloc, 1);
+                allocator_traits::construct(_alloc, _null);
+
+                _head = _null;
+                _tail = _null;
+            }
         }
-      }
-    }
-  }
+        
+        insert(begin(), other.begin(), other.end());
 
-  void sort() noexcept {
-    if (!this->empty()) {
-      for (auto it_1 = begin(); it_1 != this->end(); ++it_1) {
-        for (auto it_2 = it_1; it_2 != this->end(); ++it_2) {
-          if (*it_2 < *it_1) {
-            value_type temp_value = *it_2;
-            *it_2 = *it_1;
-            *it_1 = temp_value;
-          }
+        return *this;
+    }
+
+    list& operator=(list&& other) noexcept(std::allocator_traits<Allocator>::is_always_equal::value) {
+        clear();
+
+        if (allocator_traits::propagate_on_container_move_assignment::value) {
+            allocator_traits::destroy(_alloc, _null);
+            allocator_traits::deallocate(_alloc, _null, 1);
+
+            _alloc = other.get_allocator();
+
+            _null = std::exchange(other._null, allocator_traits::allocate(other._alloc, 1));
+            _head = std::exchange(other._head, other._null);
+            _tail = std::exchange(other._tail, other._null);
+
+            allocator_traits::construct(other._alloc, other._null);
+        } else if (_alloc != other._alloc) {
+            insert(begin(), other.begin(), other.end());
         }
-      }
+
+        return *this;
     }
-  }
 
-  private:
-    void MakeLoop() {
-      end_ptr_->next_node_ = begin_ptr_;
-      begin_ptr_->prev_node_ = end_ptr_;
-    };
+    list& operator=(std::initializer_list<value_type> ilist) {
+        clear();
 
-  private:
-    Node<value_type> *begin_ptr_;
-    Node<value_type> *end_ptr_;
-    size_type size_;
+        insert(begin(), ilist);
+
+        return *this;
+    }
+
+    allocator_type get_allocator() const {
+        return _alloc;
+    }
+
+    iterator begin() noexcept {
+        return iterator(_head);
+    }
+
+    const_iterator begin() const noexcept {
+        return const_iterator(_head);
+    }
+
+    const_iterator cbegin() const noexcept {
+        return const_iterator(_head);
+    }
+
+    iterator end() noexcept {
+        return iterator(_null);
+    }
+
+    const_iterator end() const noexcept {
+        return const_iterator(_null);
+    }
+
+    const_iterator cend() const noexcept {
+        return const_iterator(_null);
+    }
+
+    reference front() {
+        return *_head->value;
+    }
+
+    const_reference front() const {
+        return *_head->value;
+    }
+
+    reference back() {
+        return *_tail->value;
+    }
+
+    const_reference back() const {
+        return *_tail->value;
+    }
+
+    size_type size() const noexcept {
+        return std::distance(begin(), end());
+    }
+
+    bool empty() const noexcept {
+        return begin() == end();
+    }
+
+    void clear() noexcept {
+        while (_head != _null) {
+            pop_front();
+        }
+
+        _tail = _null;
+    }
+
+    iterator insert(const_iterator pos, const T& value) {
+        return insert(pos, T{value});
+    }
+
+    iterator insert(const_iterator pos, T&& value) {
+        Node<T>* curr{const_cast<Node<T>*>(pos.node())};
+        Node<T>* new_node{allocator_traits::allocate(_alloc, 1)};
+
+        allocator_traits::construct(_alloc, new_node, std::forward<T>(value), curr->prev, curr);
+
+        curr->prev->next = new_node;
+        curr->prev = new_node;
+
+        if (curr == _head) {
+            _head = new_node;
+        }
+
+        if (curr == _null) {
+            _tail = new_node;
+        }
+
+        return iterator(new_node);
+    }
+    
+    iterator insert(const_iterator pos, size_type count, const T& value) {
+        iterator it(const_cast<Node<T>*>(pos.node()));
+
+        for (size_type i{}; i < count; ++i) {
+            it = insert(it++, value);
+        }
+
+        return it;
+    }
+
+    template<
+        class InputIt,
+        typename = std::enable_if_t<std::is_base_of_v<std::input_iterator_tag,
+                                    typename std::iterator_traits<InputIt>::iterator_category>>
+    > iterator insert(const_iterator pos, InputIt first, InputIt last) {
+        iterator it(const_cast<Node<T>*>(pos.node()));
+
+        for ( ; first != last; ++it) {
+            it = insert(it, *(first++));
+        }
+
+        return it;
+    }
+
+    iterator insert(const_iterator pos, std::initializer_list<T> ilist) {
+        iterator new_it(const_cast<Node<T>*>(pos.node()));
+
+        auto ilist_beg{ilist.begin()};
+
+        for (auto it{ilist_beg}; it != ilist.end(); ++it) {
+            if (it != ilist_beg) {
+                insert(pos, *it);
+            } else {
+                new_it = insert(pos, *it);
+            }
+        }
+
+        return new_it;
+    }
+
+    iterator erase(const_iterator pos) {
+        Node<T>* curr(const_cast<Node<T>*>(pos.node()));
+
+        if (curr == _head) {
+            _head = _head->next;
+        }
+
+        if (curr == _tail) {
+            _tail = _tail->prev;
+        }
+
+        *curr->value = T();
+        curr->prev->next = curr->next;
+        curr->next->prev = curr->prev;
+
+        iterator new_it(curr->next);
+
+        allocator_traits::destroy(_alloc, curr);
+        allocator_traits::deallocate(_alloc, curr, 1);
+
+        return new_it;
+    }
+
+    iterator erase(const_iterator first, const_iterator last) {
+        iterator it(const_cast<Node<T>*>(last.node()));
+
+        while (first != last) {
+            it = erase(first++);
+        }
+
+        return it;
+    }
+
+    void push_front(const T& value) {
+        insert(cbegin(), value);
+    }
+
+    void push_front(T&& value) {
+        insert(cbegin(), std::forward<T>(value));
+    }
+
+    void pop_front() {
+        erase(cbegin());
+    }
+
+    void push_back(const T& value) {
+        insert(cend(), value);
+    }
+
+    void push_back(T&& value) {
+        insert(cend(), std::forward<T>(value));
+    }
+
+    void pop_back() {
+        erase(--cend());
+    }
+
+private:
+    Allocator _alloc;
+    
+    Node<T>* _null;
+    Node<T>* _head;
+    Node<T>* _tail;
 };
-
 } // namespace s21
 
 #endif  // LIST_H

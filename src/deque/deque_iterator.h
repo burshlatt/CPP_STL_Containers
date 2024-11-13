@@ -7,10 +7,12 @@ namespace s21 {
 template <class T>
 class deque_iterator {
 public:
-    using value_type = T;
-    using size_type  = std::size_t;
-    using pointer    = std::conditional_t<std::is_const_v<value_type>, const value_type*, value_type*>;
-    using reference  = std::conditional_t<std::is_const_v<value_type>, const value_type&, value_type&>;
+    using iterator_category = std::bidirectional_iterator_tag;
+
+    using value_type        = T;
+    using size_type         = std::size_t;
+    using pointer           = std::conditional_t<std::is_const_v<value_type>, const value_type*, value_type*>;
+    using reference         = std::conditional_t<std::is_const_v<value_type>, const value_type&, value_type&>;
 
 public:
     deque_iterator(value_type* const* data, size_type x, size_type y) :
@@ -24,7 +26,7 @@ public:
 
     pointer operator->() { return &_data[_x][_y]; }
 
-    deque_iterator &operator++() {
+    deque_iterator& operator++() {
         if (_y == _block_size - 1) {
             ++_x;
             _y = 0;
@@ -43,7 +45,7 @@ public:
         return tmp;
     }
 
-    deque_iterator &operator--() {
+    deque_iterator& operator--() {
         if (_y == 0) {
             --_x;
             _y = _block_size - 1;

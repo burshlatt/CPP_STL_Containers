@@ -1,20 +1,21 @@
 CXX = g++
 FLAGS = -Wall -Werror -Wextra
-TEST_FLAGS = -lgtest -lgmock -pthread
+TEST_FLAGS = -lgtest -lgtest_main -pthread
 
-.PHONY: test leaks clean
+.PHONY: test_list leaks_list clean
 
-test:
+test_list:
 	@echo --------------------- START ---------------------
-	$(CXX) $(FLAGS) unit_tests.cc -o unit_tests $(TEST_FLAGS)
-	./unit_tests
+	$(CXX) -std=c++17 $(FLAGS) tests/test_list.cc $(TEST_FLAGS) -o utest_list
+	./utest_list
 	@echo -------------------- SUCCESS --------------------
 
-leaks: test
-	leaks -atExit -- ./unit_tests
+leaks_list:
+	$(CXX) -g -std=c++17 $(FLAGS) tests/test_list.cc $(TEST_FLAGS) -o utest_list_leaks
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./utest_list_leaks
 	@echo ---------------------- END ----------------------
 
 clean:
 	@echo --------------------- CLEAN ---------------------
-	rm -rf unit_tests
+	rm -rf utest_*
 	@echo -------------------- SUCCESS --------------------

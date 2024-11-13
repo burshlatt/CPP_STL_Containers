@@ -1,9 +1,6 @@
 #ifndef QUEUE_H
 #define QUEUE_H
 
-#include <utility>
-#include <algorithm>
-
 #include "../deque/deque.h"
 
 namespace s21 {

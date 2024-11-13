@@ -1,9 +1,6 @@
 #ifndef STACK_H
 #define STACK_H
 
-#include <utility>
-#include <algorithm>
-
 #include "../deque/deque.h"
 
 namespace s21 {
