@@ -14,6 +14,7 @@ namespace s21 {
 template<
     class T,
     class Allocator = std::allocator<Node<T>>
+    
 > class list {
 public:
     using value_type             = T;
@@ -26,8 +27,8 @@ public:
     using allocator_type         = Allocator;
     using allocator_traits       = std::allocator_traits<Allocator>;
 
-    using pointer                = typename allocator_traits::pointer;
-    using const_pointer          = typename allocator_traits::const_pointer;
+    using pointer                = typename std::allocator_traits<Allocator>::pointer;
+    using const_pointer          = typename std::allocator_traits<Allocator>::const_pointer;
 
     using iterator               = list_iterator<Node<T>>;
     using const_iterator         = list_iterator<const Node<T>>;
@@ -37,13 +38,8 @@ public:
 
 public:
     list() :
-        _alloc(),
-        _null(allocator_traits::allocate(_alloc, 1)),
-        _head(_null),
-        _tail(_null)
-    {
-        allocator_traits::construct(_alloc, _null);
-    }
+        list(Allocator())
+    {}
 
     explicit list(const Allocator& alloc) :
         _alloc(alloc),
@@ -116,8 +112,8 @@ public:
     list& operator=(const list& other) {
         clear();
 
-        if (allocator_traits::propagate_on_container_copy_assignment::value) {
-            auto allocator{allocator_traits::select_on_container_copy_construction(other.get_allocator())};
+        if constexpr (allocator_traits::propagate_on_container_copy_assignment::value) {
+            auto allocator{other.get_allocator()};
 
             if (_alloc != allocator) {
                 allocator_traits::destroy(_alloc, _null);
@@ -125,7 +121,7 @@ public:
 
                 _alloc = std::move(allocator);
 
-                allocator_traits::allocate(_alloc, 1);
+                _null = allocator_traits::allocate(_alloc, 1);
                 allocator_traits::construct(_alloc, _null);
 
                 _head = _null;
@@ -141,7 +137,7 @@ public:
     list& operator=(list&& other) noexcept(std::allocator_traits<Allocator>::is_always_equal::value) {
         clear();
 
-        if (allocator_traits::propagate_on_container_move_assignment::value) {
+        if constexpr (allocator_traits::propagate_on_container_move_assignment::value) {
             allocator_traits::destroy(_alloc, _null);
             allocator_traits::deallocate(_alloc, _null, 1);
 

@@ -4,7 +4,7 @@
 #include <gtest/gtest.h>
 #include <list>
 
-#include "../list/list.h"
+#include "../../list/list.h"
 
 class ListTestInt : public ::testing::Test {
 public:

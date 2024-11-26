@@ -7,6 +7,7 @@ namespace s21 {
 template<
     class T,
     class Container = s21::deque<T>
+    
 > class stack {
 public:
     using container_type  = Container;
