@@ -13,13 +13,13 @@
 namespace s21 {
 template<
     class T,
-    class Allocator = std::allocator<Node<T>>
+    class Allocator = std::allocator<list_node<T>>
     
 > class list {
 public:
     using value_type             = T;
-    using node_type              = Node<T>;
     using size_type              = std::size_t;
+    using node                   = list_node<T>;
 
     using reference              = T&;
     using const_reference        = const T&;
@@ -30,11 +30,11 @@ public:
     using pointer                = typename std::allocator_traits<Allocator>::pointer;
     using const_pointer          = typename std::allocator_traits<Allocator>::const_pointer;
 
-    using iterator               = list_iterator<Node<T>>;
-    using const_iterator         = list_iterator<const Node<T>>;
+    using iterator               = list_iterator<list_node<T>>;
+    using const_iterator         = list_iterator<const list_node<T>>;
 
-    using reverse_iterator       = std::reverse_iterator<list_iterator<Node<T>>>;
-    using const_reverse_iterator = std::reverse_iterator<list_iterator<const Node<T>>>;
+    using reverse_iterator       = std::reverse_iterator<list_iterator<list_node<T>>>;
+    using const_reverse_iterator = std::reverse_iterator<list_iterator<const list_node<T>>>;
 
 public:
     list() :
@@ -93,6 +93,20 @@ public:
         _tail(std::exchange(other._tail, other._null))
     {
         allocator_traits::construct(other._alloc, other._null);
+    }
+
+    list(list&& other, const Allocator& alloc) :
+        list(alloc)
+    {
+        if (_alloc != other._alloc) {
+            insert(begin(), other.begin(), other.end());
+        } else {
+            _null = std::exchange(other._null, allocator_traits::allocate(other._alloc, 1));
+            _head = std::exchange(other._head, other._null);
+            _tail = std::exchange(other._tail, other._null);
+
+            allocator_traits::construct(other._alloc, other._null);
+        }
     }
 
     list(std::initializer_list<T> init, const Allocator& alloc = Allocator()) :
@@ -191,6 +205,30 @@ public:
         return const_iterator(_null);
     }
 
+    reverse_iterator rbegin() noexcept {
+        return reverse_iterator(end());
+    }
+
+    const_reverse_iterator rbegin() const noexcept {
+        return const_reverse_iterator(cend());
+    }
+
+    const_reverse_iterator crbegin() const noexcept {
+        return const_reverse_iterator(cend());
+    }
+
+    reverse_iterator rend() noexcept {
+        return reverse_iterator(begin());
+    }
+
+    const_reverse_iterator rend() const noexcept {
+        return const_reverse_iterator(cbegin());
+    }
+
+    const_reverse_iterator crend() const noexcept {
+        return const_reverse_iterator(cbegin());
+    }
+
     reference front() {
         return *_head->value;
     }
@@ -228,8 +266,8 @@ public:
     }
 
     iterator insert(const_iterator pos, T&& value) {
-        Node<T>* curr{const_cast<Node<T>*>(pos.node())};
-        Node<T>* new_node{allocator_traits::allocate(_alloc, 1)};
+        node* curr{const_cast<node*>(pos.node())};
+        node* new_node{allocator_traits::allocate(_alloc, 1)};
 
         allocator_traits::construct(_alloc, new_node, std::forward<T>(value), curr->prev, curr);
 
@@ -248,7 +286,7 @@ public:
     }
     
     iterator insert(const_iterator pos, size_type count, const T& value) {
-        iterator it(const_cast<Node<T>*>(pos.node()));
+        iterator it(const_cast<node*>(pos.node()));
 
         for (size_type i{}; i < count; ++i) {
             it = insert(it++, value);
@@ -262,7 +300,7 @@ public:
         typename = std::enable_if_t<std::is_base_of_v<std::input_iterator_tag,
                                     typename std::iterator_traits<InputIt>::iterator_category>>
     > iterator insert(const_iterator pos, InputIt first, InputIt last) {
-        iterator it(const_cast<Node<T>*>(pos.node()));
+        iterator it(const_cast<node*>(pos.node()));
 
         for ( ; first != last; ++it) {
             it = insert(it, *(first++));
@@ -272,7 +310,7 @@ public:
     }
 
     iterator insert(const_iterator pos, std::initializer_list<T> ilist) {
-        iterator new_it(const_cast<Node<T>*>(pos.node()));
+        iterator new_it(const_cast<node*>(pos.node()));
 
         auto ilist_beg{ilist.begin()};
 
@@ -288,7 +326,7 @@ public:
     }
 
     iterator erase(const_iterator pos) {
-        Node<T>* curr(const_cast<Node<T>*>(pos.node()));
+        node* curr(const_cast<node*>(pos.node()));
 
         if (curr == _head) {
             _head = _head->next;
@@ -311,7 +349,7 @@ public:
     }
 
     iterator erase(const_iterator first, const_iterator last) {
-        iterator it(const_cast<Node<T>*>(last.node()));
+        iterator it(const_cast<node*>(last.node()));
 
         while (first != last) {
             it = erase(first++);
@@ -347,9 +385,9 @@ public:
 private:
     Allocator _alloc;
     
-    Node<T>* _null;
-    Node<T>* _head;
-    Node<T>* _tail;
+    node* _null;
+    node* _head;
+    node* _tail;
 };
 } // namespace s21
 

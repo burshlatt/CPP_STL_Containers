@@ -39,25 +39,43 @@ public:
 
     node_type* node() const { return _curr; }
 
-    list_iterator& operator++() {
+    forward_list_iterator& operator++() {
         _curr = _curr->next;
 
         return *this;
     }
 
-    list_iterator operator++(int) {
-        list_iterator tmp(*this);
+    forward_list_iterator operator++(int) {
+        forward_list_iterator tmp(*this);
 
         _curr = _curr->next;
         
         return tmp;
     }
+    
+    forward_list_iterator& operator+=(difference_type n) noexcept {
+        while (n) {
+            _curr = _curr->next;
 
-    [[nodiscard]] bool operator==(const list_iterator& other) const {
+            --n;
+        }
+        
+        return *this;
+    }
+
+    forward_list_iterator operator+(difference_type n) const noexcept {
+        forward_list_iterator tmp(_curr);
+
+        tmp += n;
+
+        return tmp;
+    }
+
+    [[nodiscard]] bool operator==(const forward_list_iterator& other) const {
         return _curr == other._curr;
     }
 
-    [[nodiscard]] bool operator!=(const list_iterator& other) const {
+    [[nodiscard]] bool operator!=(const forward_list_iterator& other) const {
         return _curr != other._curr;
     }
 

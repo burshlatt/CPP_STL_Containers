@@ -5,7 +5,7 @@
 
 namespace s21 {
 template <class T>
-class Node {
+class forward_list_node {
 public:
     using value_type      = T;
 
@@ -16,34 +16,30 @@ public:
     using const_reference = const T&;
 
 public:
-    explicit Node() :
+    explicit forward_list_node() :
         value(nullptr),
-        next(this),
-        _is_null(true)
+        next(nullptr)
     {}
 
-    explicit Node(const value_type& v, Node<T>* n) :
-        Node(T{v}, n)
+    explicit forward_list_node(forward_list_node<T>* n) :
+        value(nullptr),
+        next(n)
     {}
 
-    explicit Node(value_type&& v, Node<T>* n) :
+    explicit forward_list_node(const value_type& v, forward_list_node<T>* n) :
+        value(std::make_unique<T>(v)),
+        next(n)
+    {}
+
+    explicit forward_list_node(value_type&& v, forward_list_node<T>* n) :
         value(std::make_unique<T>(std::move(v))),
-        next(n),
-        _is_null(false)
+        next(n)
     {}
-
-private:
-    [[nodiscard]] bool is_null() const noexcept {
-        return _is_null;
-    }
 
 public:
     std::unique_ptr<T> value;
 
-    Node<T>* next;
-
-private:
-    bool _is_null;
+    forward_list_node<T>* next;
 };
 } // namespace s21
 

@@ -722,6 +722,28 @@ TEST_F(DequeTestInt, TEST_47) {
     _orig = new std::deque<int>(list.begin(), list.end());
 }
 
+TEST_F(DequeTestInt, TEST_48) {
+    _my = new s21::deque<int>();
+    _orig = new std::deque<int>();
+
+    for (int i{}; i < 2000; ++i) {
+        _my->push_back(i);
+        _orig->push_back(i);
+    }
+
+    for (int i{}; i < 2000; ++i) {
+        _my->push_front(i);
+        _orig->push_front(i);
+    }
+
+    s21::deque<int> my_tmp(*_my);
+    std::deque<int> orig_tmp(*_orig);
+
+    for (std::size_t i{}; i < orig_tmp.size(); ++i) {
+        EXPECT_EQ(my_tmp[i], orig_tmp[i]);
+    }
+}
+
 /*
      ----------------------------------------------------------
     |                                                          |

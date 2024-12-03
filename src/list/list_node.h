@@ -5,7 +5,7 @@
 
 namespace s21 {
 template <class T>
-class Node {
+class list_node {
 public:
     using value_type      = T;
 
@@ -16,18 +16,18 @@ public:
     using const_reference = const T&;
 
 public:
-    explicit Node() :
+    explicit list_node() :
         value(nullptr),
         prev(this),
         next(this),
         _is_null(true)
     {}
 
-    explicit Node(const value_type& v, Node<T>* p, Node<T>* n) :
-        Node(T{v}, p, n)
+    explicit list_node(const value_type& v, list_node<T>* p, list_node<T>* n) :
+        list_node(T{v}, p, n)
     {}
 
-    explicit Node(value_type&& v, Node<T>* p, Node<T>* n) :
+    explicit list_node(value_type&& v, list_node<T>* p, list_node<T>* n) :
         value(std::make_unique<T>(std::move(v))),
         prev(p),
         next(n),
@@ -42,8 +42,8 @@ private:
 public:
     std::unique_ptr<T> value;
 
-    Node<T>* prev;
-    Node<T>* next;
+    list_node<T>* prev;
+    list_node<T>* next;
 
 private:
     bool _is_null;

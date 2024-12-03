@@ -33,11 +33,17 @@ public:
     {}
 
 public:
-    reference operator*() const { return *_curr->value; }
+    reference operator*() const {
+        return *_curr->value;
+    }
 
-    pointer operator->() const { return _curr->value; }
+    pointer operator->() const {
+        return _curr->value.get();
+    }
 
-    node_type* node() const { return _curr; }
+    node_type* node() const {
+        return _curr;
+    }
 
     list_iterator& operator++() {
         _curr = _curr->next;
@@ -63,6 +69,42 @@ public:
         list_iterator tmp(*this);
 
         _curr = _curr->prev;
+
+        return tmp;
+    }
+
+    list_iterator& operator+=(difference_type n) noexcept {
+        while (n) {
+            _curr = _curr->next;
+
+            --n;
+        }
+        
+        return *this;
+    }
+
+    list_iterator operator+(difference_type n) const noexcept {
+        list_iterator tmp(_curr);
+
+        tmp += n;
+
+        return tmp;
+    }
+
+    list_iterator& operator-=(difference_type n) noexcept {
+        while (n) {
+            _curr = _curr->prev;
+
+            --n;
+        }
+        
+        return *this;
+    }
+
+    list_iterator operator-(difference_type n) const noexcept {
+        list_iterator tmp(_curr);
+
+        tmp -= n;
 
         return tmp;
     }
