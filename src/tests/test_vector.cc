@@ -746,14 +746,19 @@ TEST_F(VectorTestInt, TEST_49) {
 
     EXPECT_EQ(*my_it, *orig_it);
     EXPECT_EQ(*my_it, num);
+}
 
-    my_it = _my->insert(_my->end() - 1, {1, 2, 3, 4, 5});
-    orig_it = _orig->insert(_orig->end() - 1, {1, 2, 3, 4, 5});
+TEST_F(VectorTestInt, TEST_50) {
+    _my = new s21::vector<int>({1, 2, 3, 4, 5});
+    _orig = new std::vector<int>({1, 2, 3, 4, 5});
+
+    auto my_it{_my->insert(_my->end() - 1, {1, 2, 3, 4, 5})};
+    auto orig_it{_orig->insert(_orig->end() - 1, {1, 2, 3, 4, 5})};
 
     EXPECT_EQ(*my_it, *orig_it);
 }
 
-TEST_F(VectorTestInt, TEST_50) {
+TEST_F(VectorTestInt, TEST_51) {
     std::list<int> list({1, 2, 3, 4, 5});
 
     _my = new s21::vector<int>(list.begin(), list.end());

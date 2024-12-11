@@ -336,7 +336,7 @@ public:
             _tail = _tail->prev;
         }
 
-        *curr->value = T();
+        // curr->value = nullptr;
         curr->prev->next = curr->next;
         curr->next->prev = curr->prev;
 

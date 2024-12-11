@@ -38,7 +38,10 @@ public:
     {}
 
     explicit vector(const Allocator& alloc) noexcept :
-        vector(0, alloc)
+        _alloc(alloc),
+        _size(0),
+        _capacity(0),
+        _data(nullptr)
     {}
 
     explicit vector(size_type count, const Allocator& alloc = Allocator()) :
@@ -244,27 +247,27 @@ public:
     }
 
     iterator begin() noexcept {
-        return _data;
+        return iterator(_data);
     }
 
     const_iterator begin() const noexcept {
-        return _data;
+        return const_iterator(_data);
     }
 
     const_iterator cbegin() const noexcept {
-        return _data;
+        return const_iterator(_data);
     }
 
     iterator end() noexcept {
-        return _data + _size;
+        return iterator(_data + _size);
     }
 
     const_iterator end() const noexcept {
-        return _data + _size;
+        return const_iterator(_data + _size);
     }
 
     const_iterator cend() const noexcept {
-        return _data + _size;
+        return const_iterator(_data + _size);
     }
 
     bool empty() const noexcept {
@@ -316,7 +319,7 @@ public:
 
         auto tail{std::move(it + 1, end(), it)};
 
-        *tail = std::move(value_type());
+        allocator_traits::destroy(_alloc, tail.base());
 
         --_size;
 
@@ -336,7 +339,7 @@ public:
         auto count{std::distance(first, last)};
 
         for (iterator it{end() - count}; it != end(); ++it) {
-            *it = std::move(value_type());
+            allocator_traits::destroy(_alloc, it.base());
         }
 
         _size -= count;
@@ -360,10 +363,14 @@ public:
         }
 
         iterator it{begin() + offset};
-    
-        std::move_backward(it, end(), end() + 1);
 
-        *it = std::move(value);
+        if (it != end()) {
+            std::uninitialized_move(end() - 1, end(), end());
+            std::move_backward(it, end() - 1, end());
+            allocator_traits::destroy(_alloc, it.base());
+        }
+
+        allocator_traits::construct(_alloc, it.base(), std::move(value));
 
         ++_size;
 
@@ -383,12 +390,13 @@ public:
 
         iterator it{begin() + offset};
 
-        std::move_backward(it, end(), end() + count);
-        std::fill_n(it, count, value);
+        for (size_type i{}; i < count; ++i) {
+            it = insert(it, value);
 
-        _size += count;
+            ++it;
+        }
 
-        return it;
+        return begin() + offset;
     }
 
     template <
@@ -428,19 +436,16 @@ private:
             return;
         } else if (!new_cap) {
             dealloc();
-
             return;
         }
 
         value_type* tmp{allocator_traits::allocate(_alloc, new_cap)};
 
-        if (tmp) {
-            std::uninitialized_value_construct(tmp, tmp + new_cap);
-        }
-
         size_type offset{std::min(new_cap, _size)};
 
-        std::move(begin(), begin() + offset, tmp);
+        if (tmp && _data) {
+            std::uninitialized_move(_data, _data + offset, tmp);
+        }
 
         dealloc();
 
@@ -448,6 +453,32 @@ private:
         _size = offset;
         _capacity = new_cap;
     }
+
+    // void realloc(size_type new_cap) {
+    //     if (new_cap == _capacity) {
+    //         return;
+    //     } else if (!new_cap) {
+    //         dealloc();
+
+    //         return;
+    //     }
+
+    //     value_type* tmp{allocator_traits::allocate(_alloc, new_cap)};
+
+    //     if (tmp) {
+    //         std::uninitialized_value_construct(tmp, tmp + new_cap);
+    //     }
+
+    //     size_type offset{std::min(new_cap, _size)};
+
+    //     std::move(begin(), begin() + offset, tmp);
+
+    //     dealloc();
+
+    //     _data = tmp;
+    //     _size = offset;
+    //     _capacity = new_cap;
+    // }
 
     void dealloc() {
         if (_data) {
