@@ -454,32 +454,6 @@ private:
         _capacity = new_cap;
     }
 
-    // void realloc(size_type new_cap) {
-    //     if (new_cap == _capacity) {
-    //         return;
-    //     } else if (!new_cap) {
-    //         dealloc();
-
-    //         return;
-    //     }
-
-    //     value_type* tmp{allocator_traits::allocate(_alloc, new_cap)};
-
-    //     if (tmp) {
-    //         std::uninitialized_value_construct(tmp, tmp + new_cap);
-    //     }
-
-    //     size_type offset{std::min(new_cap, _size)};
-
-    //     std::move(begin(), begin() + offset, tmp);
-
-    //     dealloc();
-
-    //     _data = tmp;
-    //     _size = offset;
-    //     _capacity = new_cap;
-    // }
-
     void dealloc() {
         if (_data) {
             for (size_type i{}; i < _size; ++i) {
